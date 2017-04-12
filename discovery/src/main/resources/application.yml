@@ -1,0 +1,47 @@
+#使用random函数来配置server.port。这样就可以指定端口的取值范围，
+#由于默认的实例ID会由server.port拼接，而此时server.port设置的随机值会重新取一次随机数，
+#所以使用这种方法的时候不需要重新定义实例ID的规则就能产生不同的实例ID了
+server:
+  port: 8761 #${random.int[10000,19999]}
+
+eureka:
+  instance:
+    hostname: discovery
+    #  在默认设置下，该服务注册中心也会将自己作为客户端来尝试注册它自己，所以我们需要禁用它的客户端注册行为
+  client:
+    registerWithEureka: false
+    fetchRegistry: false
+    #eureka.client.serviceUrl.defaultZone属性对应服务注册中心的配置内容，指定服务注册中心的位置
+    serviceUrl:
+      defaultZone: http://${eureka.instance.hostname:localhost}:${server.port:8761}/eureka/
+#明确提出配置服务器将会通过Eureka服务器被发现（发布）
+spring:
+  cloud:
+    config:
+      discovery:
+        enabled: true
+
+
+
+##---
+#spring:
+#  profiles: peer1 # 指定profile=peer1
+#server:
+#  port: 8761
+#eureka:
+#  instance:
+#    hostname: peer1 # 指定当profile=peer1时，主机名
+#  client:
+#    serviceUrl:
+#      defaultZone: http://peer2:8762/eureka/ # 将自己注册到peer2这个Eureka上面去
+##---
+#spring:
+#  profiles: peer2
+#server:
+#  port: 8762
+#eureka:
+#  instance:
+#    hostname: peer2
+#  client:
+#    serviceUrl:
+#      defaultZone:  http://discovery:8761/eureka/ # 指定注册中心的地址

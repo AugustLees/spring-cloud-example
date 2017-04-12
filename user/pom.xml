@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <!--项目基本信息配置-->
+    <artifactId>user</artifactId>
+    <version>${current.project.version}</version>
+    <packaging>jar</packaging>
+
+    <!--指定项目继承信息-->
+    <parent>
+        <artifactId>spring-cloud-example</artifactId>
+        <groupId>com.august.spring</groupId>
+        <version>${current.project.version}</version>
+        <!--<relativePath>../pom.xml</relativePath>此段必须加上,用来继承父模块,不然无法继承父级pom-->
+        <relativePath>../pom.xml</relativePath>
+    </parent>
+
+    <!--设定项目的配置文件信息-->
+    <properties>
+        <docker.image.prefix>august</docker.image.prefix>
+        <springfox.swagger.version>2.6.1</springfox.swagger.version>
+    </properties>
+
+    <!--指定项目在整个项目下的名称以及对项目进行相应的描述-->
+    <name>User项目应用用户管理</name>
+    <description>
+        spring-cloud 项目用户管理模块,user主要用于用户的管理。
+        通过@EnableDiscoveryClient 实现该服务在Eureka中的注册
+    </description>
+
+    <!--引入本项目使用的相关依赖的jar包-->
+    <dependencies>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-rest</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.data</groupId>
+            <artifactId>spring-data-neo4j</artifactId>
+            <exclusions>
+                <exclusion>
+                    <artifactId>neo4j-cypher-compiler-1.9</artifactId>
+                    <groupId>org.neo4j</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>neo4j-cypher-compiler-2.0</artifactId>
+                    <groupId>org.neo4j</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>neo4j-cypher-compiler-2.1</artifactId>
+                    <groupId>org.neo4j</groupId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+
+        <!--&lt;!&ndash; spring cloud 路由 &ndash;&gt;-->
+        <!--<dependency>-->
+        <!--<groupId>org.springframework.cloud</groupId>-->
+        <!--<artifactId>spring-cloud-starter-hystrix</artifactId>-->
+        <!--</dependency>-->
+        <!-- spring cloud 路由 -->
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-zuul</artifactId>
+        </dependency>
+        <!-- spring cloud 注册服务 添加Eureka的依赖 -->
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-eureka</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.hibernate</groupId>
+            <artifactId>hibernate-validator</artifactId>
+        </dependency>
+
+
+        <!--引入swagger2，用于完成接口的相关信息-->
+        <dependency>
+            <groupId>io.springfox</groupId>
+            <artifactId>springfox-swagger2</artifactId>
+            <version>${springfox.swagger.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.springfox</groupId>
+            <artifactId>springfox-swagger-ui</artifactId>
+            <version>${springfox.swagger.version}</version>
+        </dependency>
+
+
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-jpa</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.h2database</groupId>
+            <artifactId>h2</artifactId>
+        </dependency>
+        <!-- spring cloud 监控  http://localhost:8080/health -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-actuator</artifactId>
+        </dependency>
+    </dependencies>
+
+    <!--创建文件创建时相应的基本配置信息-->
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>repackage</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>com.spotify</groupId>
+                <artifactId>docker-maven-plugin</artifactId>
+                <version>${docker.plugin.version}</version>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>build</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <imageName>${docker.image.prefix}/${project.artifactId}</imageName>
+                    <dockerDirectory>${project.basedir}/src/main/docker</dockerDirectory>
+                    <resources>
+                        <resource>
+                            <targetPath>/</targetPath>
+                            <directory>${project.build.directory}</directory>
+                            <include>${project.build.finalName}.jar</include>
+                        </resource>
+                    </resources>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+</project>

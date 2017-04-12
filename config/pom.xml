@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <!--设定项目的基本信息-->
+    <artifactId>config</artifactId>
+    <version>${current.project.version}</version>
+    <packaging>jar</packaging>
+
+    <!--指定项目继承信息-->
+    <parent>
+        <artifactId>spring-cloud-example</artifactId>
+        <groupId>com.august.spring</groupId>
+        <version>${current.project.version}</version>
+        <!--<relativePath>../pom.xml</relativePath>此段必须加上,用来继承父模块,不然无法继承父级pom-->
+        <relativePath>../pom.xml</relativePath>
+    </parent>
+
+    <!--设定项目的配置文件信息-->
+    <properties>
+        <docker.image.prefix>august</docker.image.prefix>
+        <start-class>com.august.spring.configServer.ConfigApplication</start-class>
+    </properties>
+
+    <!--指定项目在整个项目下的名称以及对项目进行相应的描述-->
+    <name>Config项目服务配置（全局配置中心）</name>
+    <description>
+        服务配置（全局配置中心）
+        spring-cloud 项目配置管理模块,config主要用于配置管理。
+        通过@EnableConfigServer配置服务端，服务管理配置信息
+    </description>
+
+    <!--引入本项目使用的相关依赖的jar包-->
+    <dependencies>
+        <!-- spring cloud 监控  http://localhost:8080/health -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-actuator</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter</artifactId>
+        </dependency>
+        <!-- spring cloud 注册服务 -->
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-eureka</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-config-server</artifactId>
+        </dependency>
+    </dependencies>
+
+    <!--创建文件创建时相应的基本配置信息-->
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>repackage</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>com.spotify</groupId>
+                <artifactId>docker-maven-plugin</artifactId>
+                <version>${docker.plugin.version}</version>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>build</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <imageName>${docker.image.prefix}/${project.artifactId}</imageName>
+                    <dockerDirectory>${project.basedir}/src/main/docker</dockerDirectory>
+                    <resources>
+                        <resource>
+                            <targetPath>/</targetPath>
+                            <directory>${project.build.directory}</directory>
+                            <include>${project.build.finalName}.jar</include>
+                        </resource>
+                    </resources>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+
+
+</project>

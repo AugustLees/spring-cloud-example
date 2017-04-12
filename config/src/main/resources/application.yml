@@ -1,0 +1,30 @@
+#使用random函数来配置server.port。这样就可以指定端口的取值范围，
+#由于默认的实例ID会由server.port拼接，而此时server.port设置的随机值会重新取一次随机数，
+#所以使用这种方法的时候不需要重新定义实例ID的规则就能产生不同的实例ID了
+server:
+  port: 8888 #${random.int[10000,19999]}
+
+
+eureka:
+  instance:
+    hostname: config
+    preferIpAddress: true
+  client:
+    registerWithEureka: true
+    fetchRegistry: true
+    serviceUrl:
+      defaultZone:  http://discovery:8761/eureka/ # 指定注册中心的地址
+
+spring:
+  cloud:
+    config:
+      server:
+        git:
+          uri: https://github.com/liping0000/spring-boot-config
+          #如果配置文件放置在Git存储库的根目录下，则无需使用searchPaths参数，
+          #如果配置文件在my-sample-config目录中，则需要使用searchPaths参数提示Config服务器搜索my-sample-config子目录。
+          #searchPaths:
+        #native:
+          #从本地classpath 或文件系统中加载配置文件的方式
+          #search-locations:
+#      name: config

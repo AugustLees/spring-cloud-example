@@ -1,0 +1,39 @@
+#使用random函数来配置server.port。这样就可以指定端口的取值范围，
+#由于默认的实例ID会由server.port拼接，而此时server.port设置的随机值会重新取一次随机数，
+#所以使用这种方法的时候不需要重新定义实例ID的规则就能产生不同的实例ID了
+server:
+  port: 1000 #${random.int[10000,19999]}
+
+sidecar:
+  port: 8000
+
+endpoints:
+  restart:
+    enabled: true
+  shutdown:
+    enabled: true
+  health:
+    sensitive: false
+
+eureka:
+  instance:
+    hostname: gateway
+  client:
+    registerWithEureka: true
+    fetchRegistry: true
+    serviceUrl:
+      defaultZone:  http://discovery:8761/eureka/ # 指定注册中心的地址
+## 下面整个树都非必须，如果不配置，将默认使用 http://GATEWAY:GATEWAY_PORT/
+##想要访问的Eureka服务id的小写/** 路由到：http://想要访问的Eureka服务id的小写:该服务端口/**
+#zuul:
+#  routes:
+#    user: # 可以随便写，在zuul上面唯一即可；当这里的值 = service-id时，service-id可以不写。
+#      path: /user/** # 想要映射到的路径
+#      service-id: user # Eureka中的serviceId
+
+#zuul:
+#  ignored-services: user # 需要忽视的服务(配置后将不会被路由)
+#  routes:
+#    movie: # 可以随便写，在zuul上面唯一即可；当这里的值 = service-id时，service-id可以不写。
+#      path: /movie/** # 想要映射到的路径
+#      service-id: movie-ribbon # Eureka中的serviceId

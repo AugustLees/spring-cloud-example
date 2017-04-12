@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <!--设定项目的基本信息-->
+    <artifactId>api-gateway</artifactId>
+    <version>${current.project.version}</version>
+    <packaging>jar</packaging>
+
+    <!--指定项目继承信息-->
+    <parent>
+        <artifactId>spring-cloud-example</artifactId>
+        <groupId>com.august.spring</groupId>
+        <version>${current.project.version}</version>
+        <!--<relativePath>../pom.xml</relativePath>此段必须加上,用来继承父模块,不然无法继承父级pom-->
+        <relativePath>../pom.xml</relativePath>
+    </parent>
+
+    <!--设定项目的配置文件信息-->
+    <properties>
+        <docker.image.prefix>august</docker.image.prefix>
+    </properties>
+
+    <!--指定项目在整个项目下的名称以及对项目进行相应的描述-->
+    <name>API网关</name>
+    <description>
+        api-gateway主要是为了统一暴露接口而生，服务众多的情况下，对前端来讲，
+        我不需要记住那么多的域名地址来调用API，我需要记住的只是gateway的地址
+        就行。
+        Zuul提供了动态路由、监控、回退、安全等功能。
+    </description>
+
+    <!--引入本项目使用的相关依赖的jar包-->
+    <dependencies>
+        <!--Zuul提供了动态路由、监控、回退、安全等功能-->
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-zuul</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-netflix-sidecar</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter</artifactId>
+        </dependency>
+    </dependencies>
+
+    <!--创建文件创建时相应的基本配置信息-->
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>repackage</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>com.spotify</groupId>
+                <artifactId>docker-maven-plugin</artifactId>
+                <version>${docker.plugin.version}</version>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>build</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <imageName>${docker.image.prefix}/${project.artifactId}</imageName>
+                    <dockerDirectory>${project.basedir}/src/main/docker</dockerDirectory>
+                    <resources>
+                        <resource>
+                            <targetPath>/</targetPath>
+                            <directory>${project.build.directory}</directory>
+                            <include>${project.build.finalName}.jar</include>
+                        </resource>
+                    </resources>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+
+</project>

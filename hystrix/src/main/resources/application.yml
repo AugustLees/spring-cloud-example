@@ -1,0 +1,46 @@
+info:
+  component: Hystrix Dashboard
+  
+endpoints:
+  restart:
+    enabled: true
+  shutdown:
+    enabled: true
+
+server:
+  port: 7979
+
+logging:
+  level:
+    ROOT: INFO
+    org.springframework.web: DEBUG
+
+eureka:
+  client:
+    #Region where eureka is deployed -For AWS specify one of the AWS regions, for other datacenters specify a arbitrary string
+    #indicating the region.This is normally specified as a -D option (eg) -Deureka.region=us-east-1
+    #eureka部署到region-AWS指定一个AWS区域，其他数据中心指定一个任意的字符串表示的区域。
+    #这通常是指定为D选项（EG）-Deureka.region=us-east-1。
+    region: default
+
+
+    #For eureka clients running in eureka server, it needs to connect to servers in other zones
+    #对于eureka客户端在eureka服务器运行，它需要连接到其他区域的服务器
+    preferSameZone: false
+
+    #Change this if you want to use a DNS based lookup for determining other eureka servers. For example
+    #of specifying the DNS entries, check the eureka-client-test.properties, eureka-client-prod.properties
+    #如果您想使用基于DNS的查找来确定其他eureka服务器，请更改此配置。
+    #为指定的DNS条目的例子，检查eureka-client-test.properties，eureka-client-prod.properties
+    #shouldUseDns: false
+
+    us-east-1:
+      availabilityZones: default
+    serviceUrl:
+      defaultZone: http://discovery:8761/eureka/ # 指定注册中心的地址
+  instance:
+    #Virtual host name by which the clients identifies this service
+    virtualHostName: ${spring.application.name}
+    # 此处，preferIpAddress不设置或者设为false，
+    #    不能设为true，否则影响turbine的测试。turbine存在的问题：
+    # eureka.instance.hostname一致时只能检测到一个节点，会造成turbine数据不完整
